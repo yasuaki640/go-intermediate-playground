@@ -11,7 +11,7 @@ func main() {
 	r := chi.NewRouter()
 
 	r.HandleFunc("/", handlers.HelloHandler)
-	r.Get("/article", handlers.PostArticleHandler)
+	r.Post("/article", handlers.PostArticleHandler)
 	r.Get("/article/list", handlers.ArticleListHandler)
 	r.Get("/article/{id}", handlers.ArticleDetailHandler)
 	r.Post("/article/nice", handlers.PostNiceHandler)
