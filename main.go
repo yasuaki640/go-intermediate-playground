@@ -18,37 +18,35 @@ func main() {
 	}
 	defer db.Close()
 
-	const sqlStr = `select * from articles;`
-	rows, err := db.Query(sqlStr)
+	const sqlStr = `
+		select *
+		from articles
+		where article_id = ?
+	`
+	row := db.QueryRow(sqlStr, 10000)
+	if err := row.Err(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var article models.Article
+	var createdTime sql.NullTime
+	err = row.Scan(
+		&article.ID,
+		&article.Title,
+		&article.Contents,
+		&article.UserName,
+		&article.NiceNum,
+		&createdTime,
+	)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	defer rows.Close()
 
-	articleArray := make([]models.Article, 0)
-	for rows.Next() {
-		var article models.Article
-		var createdTime sql.NullTime
-		err := rows.Scan(
-			&article.ID,
-			&article.Title,
-			&article.Contents,
-			&article.UserName,
-			&article.NiceNum,
-			&createdTime,
-		)
-
-		if createdTime.Valid {
-			article.CreatedAt = createdTime.Time
-		}
-
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			articleArray = append(articleArray, article)
-		}
+	if createdTime.Valid {
+		article.CreatedAt = createdTime.Time
 	}
 
-	fmt.Println("%+v\n", articleArray)
+	fmt.Println("%+v\n", article)
 }
