@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/yasuaki640/go-intermediate-playground/models"
 )
 
 func main() {
@@ -18,22 +17,41 @@ func main() {
 	}
 	defer db.Close()
 
-	article := models.Article{
-		Title:    "ネットニューsう",
-		Contents: "実は性格の悪い芸能人4選",
-		UserName: "ore",
-	}
-
-	const sqlStr = `
-		insert into articles (title, contents, username, nice, created_at) values (?,?,?,0,now());
-	`
-
-	result, err := db.Exec(sqlStr, article.Title, article.Contents, article.UserName)
+	tx, err := db.Begin()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	fmt.Println(result.LastInsertId())
-	fmt.Println(result.RowsAffected())
+	artcle_id := 1
+	const sqlGetNice = `
+		select nice
+		from articles
+		where article_id = ?;
+	`
+
+	row := tx.QueryRow(sqlGetNice, artcle_id)
+	if err := row.Err(); err != nil {
+		fmt.Println(err)
+		tx.Rollback()
+		return
+	}
+
+	var nicenum int
+	err = row.Scan(&nicenum)
+	if err != nil {
+		fmt.Println(err)
+		tx.Rollback()
+		return
+	}
+
+	const sqlUpdateNice = `update articles set nice = ? where article_id = ?`
+	_, err = tx.Exec(sqlUpdateNice, nicenum+1, artcle_id)
+	if err != nil {
+		fmt.Println(err)
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
 }
