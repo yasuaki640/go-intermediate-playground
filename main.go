@@ -3,7 +3,11 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/yasuaki640/go-intermediate-playground/handlers"
+	"log"
+	"net/http"
 )
 
 func main() {
@@ -17,41 +21,17 @@ func main() {
 	}
 	defer db.Close()
 
-	tx, err := db.Begin()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	r := chi.NewRouter()
 
-	artcle_id := 1
-	const sqlGetNice = `
-		select nice
-		from articles
-		where article_id = ?;
-	`
+	r.HandleFunc("/", handlers.HelloHandler)
+	r.Post("/article", handlers.PostArticleHandler)
+	r.Get("/article/list", handlers.ArticleListHandler)
+	r.Get("/article/{id}", handlers.ArticleDetailHandler)
+	r.Post("/article/nice", handlers.PostNiceHandler)
+	r.Post("/comment", handlers.PostCommentHandler)
 
-	row := tx.QueryRow(sqlGetNice, artcle_id)
-	if err := row.Err(); err != nil {
-		fmt.Println(err)
-		tx.Rollback()
-		return
-	}
+	log.Println("listening at port 8080")
 
-	var nicenum int
-	err = row.Scan(&nicenum)
-	if err != nil {
-		fmt.Println(err)
-		tx.Rollback()
-		return
-	}
-
-	const sqlUpdateNice = `update articles set nice = ? where article_id = ?`
-	_, err = tx.Exec(sqlUpdateNice, nicenum+1, artcle_id)
-	if err != nil {
-		fmt.Println(err)
-		tx.Rollback()
-		return
-	}
-
-	tx.Commit()
+	err = http.ListenAndServe(":8080", r)
+	log.Fatal(err) // exit 1のときにログ出力される
 }
