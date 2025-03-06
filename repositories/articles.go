@@ -76,13 +76,12 @@ func SelectArticleList(db *sql.DB, page int) ([]models.Article, error) {
 		from articles
 		limit ? offset ?;
 	`
-
 	rows, err := db.Query(sqlStr, PerPage, (page-1)*PerPage)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
-	defer db.Close()
+	defer rows.Close()
 
 	articleArray := make([]models.Article, 0)
 	for rows.Next() {

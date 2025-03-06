@@ -72,29 +72,29 @@ func TestSelectArticleList(t *testing.T) {
 	}
 }
 
-//func TestInsertArticle(t *testing.T) {
-//	article := models.Article{
-//		Title:    "insertTest",
-//		Contents: "testest",
-//		UserName: "saki",
-//	}
-//	expectedArticleNum := 3
-//	newArticle, err := repositories.InsertArticle(testDB, article)
-//	if err != nil {
-//		t.Error(err)
-//	}
-//	if newArticle.ID != expectedArticleNum {
-//		t.Errorf("new article id is expected %d but got %d\n", expectedArticleNum, newArticle.ID)
-//	}
-//
-//	t.Cleanup(func() {
-//		const sqlStr = `
-//            delete from articles
-//            where title = ? and contents = ? and username = ?;
-//        `
-//		_, err := testDB.Exec(sqlStr, article.Title, article.Contents, article.UserName)
-//		if err != nil {
-//			t.Error(err)
-//		}
-//	})
-//}
+func TestInsertArticle(t *testing.T) {
+	article := models.Article{
+		Title:    "insertTest",
+		Contents: "testest",
+		UserName: "saki",
+	}
+	
+	newArticle, err := repositories.InsertArticle(testDB, article)
+	if err != nil {
+		t.Error(err)
+	}
+	if newArticle.Title != article.Title {
+		t.Errorf("got %s but want %s", newArticle.Title, article.Title)
+	}
+
+	t.Cleanup(func() {
+		const sqlStr = `
+           delete from articles
+           where article_id = ?;
+       `
+		_, err := testDB.Exec(sqlStr, newArticle.ID)
+		if err != nil {
+			t.Error(err)
+		}
+	})
+}
