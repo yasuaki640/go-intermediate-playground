@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"os/exec"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -32,12 +33,59 @@ func setup() error {
 	if err := connectDB(); err != nil {
 		return err
 	}
+	if err := cleanupDB(); err != nil {
+		fmt.Println("cleanup", err)
+	}
+	if err := setupTestData(); err != nil {
+		fmt.Println("setup", err)
+		return err
+	}
+	return nil
+}
+
+func setupTestData() error {
+	cmd := exec.Command(
+		"mysql",
+		"-h",
+		"127.0.0.1",
+		"-u",
+		dbUser,
+		dbDatabase,
+		"--password="+dbPassword,
+		"-e",
+		"source ./testdata/setup.sql",
+	)
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 // 前テスト共通の後処理を書く
 func teardown() {
+	cleanupDB()
 	testDB.Close()
+}
+
+func cleanupDB() error {
+	cmd := exec.Command(
+		"mysql",
+		"-h",
+		"127.0.0.1",
+		"-u",
+		dbUser,
+		dbDatabase,
+		"--password="+dbPassword,
+		"-e",
+		"source ./testdata/cleanupDB.sql",
+	)
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func TestMain(m *testing.M) {

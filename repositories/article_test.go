@@ -3,6 +3,7 @@ package repositories_test
 import (
 	"github.com/yasuaki640/go-intermediate-playground/models"
 	"github.com/yasuaki640/go-intermediate-playground/repositories"
+	"github.com/yasuaki640/go-intermediate-playground/repositories/testdata"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -42,22 +43,10 @@ func TestSelectArticleDetail(t *testing.T) {
 	}{
 		{
 			testTitle: "sub1",
-			expected: models.Article{
-				ID:       1,
-				Title:    "firstPost",
-				Contents: "This is my first blog",
-				UserName: "saki",
-				NiceNum:  3,
-			},
+			expected:  testdata.ArticleTestData[0],
 		}, {
 			testTitle: "sub2",
-			expected: models.Article{
-				ID:       2,
-				Title:    "2nd",
-				Contents: "Second blog post",
-				UserName: "saki",
-				NiceNum:  4,
-			},
+			expected:  testdata.ArticleTestData[1],
 		},
 	}
 
@@ -80,15 +69,15 @@ func TestSelectArticleDetail(t *testing.T) {
 			if got.UserName != test.expected.UserName {
 				t.Errorf("UserName: get %s but want %s\n", got.UserName, test.expected.UserName)
 			}
-			//if got.NiceNum != test.expected.NiceNum {
-			//	t.Errorf("NiceNum: get %d but want %d\n", got.NiceNum, test.expected.NiceNum)
-			//}
+			if got.NiceNum != test.expected.NiceNum {
+				t.Errorf("NiceNum: get %d but want %d\n", got.NiceNum, test.expected.NiceNum)
+			}
 		})
 	}
 }
 
 func TestSelectArticleList(t *testing.T) {
-	expectedNum := 2
+	expectedNum := len(testdata.ArticleTestData)
 	got, err := repositories.SelectArticleList(testDB, 1)
 	if err != nil {
 		t.Fatal(err)
