@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/yasuaki640/go-intermediate-playground/models"
+	"github.com/yasuaki640/go-intermediate-playground/services"
 	"io"
 	"net/http"
 	"strconv"
@@ -19,7 +20,12 @@ func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
 	}
 
-	article := reqArticle
+	article, err := services.PostArticleService(reqArticle)
+	if err != nil {
+		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		return
+	}
+
 	json.NewEncoder(w).Encode(article)
 }
 
