@@ -27,7 +27,7 @@ func main() {
 	r.Post("/article", handlers.PostArticleHandler)
 	r.Get("/article/list", handlers.ArticleListHandler)
 	r.Get("/article/{id}", handlers.ArticleDetailHandler)
-	r.Post("/article/nice", handlers.PostNiceHandler)
+	r.Put("/article/{id}/nice", handlers.PostNiceHandler)
 	r.Post("/comment", handlers.PostCommentHandler)
 
 	log.Println("listening at port 8080")

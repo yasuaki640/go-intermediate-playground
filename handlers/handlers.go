@@ -30,8 +30,26 @@ func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func ArticleListHandler(w http.ResponseWriter, req *http.Request) {
-	articles := []models.Article{models.Article1, models.Article2}
-	json.NewEncoder(w).Encode(articles)
+	pageStr := req.URL.Query().Get("page")
+
+	var page int
+	if pageStr == "" {
+		page = 1
+	} else {
+		var err error
+		page, err = strconv.Atoi(pageStr)
+		if err != nil {
+			http.Error(w, "Invalid query parameter", http.StatusBadRequest)
+			return
+		}
+	}
+
+	artcles, err := services.GetArticleListService(page)
+	if err != nil {
+		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(artcles)
 }
 
 func ArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
@@ -41,19 +59,27 @@ func ArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	articles := []models.Article{models.Article1, models.Article2}
-	var resData *models.Article
-	for _, article := range articles {
-		if article.ID == articleID {
-			resData = &article
-		}
+	article, err := services.GetArticleService(articleID)
+	if err != nil {
+		http.Error(w, "failed to get article", http.StatusNotFound)
+		return
 	}
 
-	json.NewEncoder(w).Encode(resData)
+	json.NewEncoder(w).Encode(article)
 }
 
 func PostNiceHandler(w http.ResponseWriter, req *http.Request) {
-	article := models.Article1
+	articleID, err := strconv.Atoi(chi.URLParam(req, "id"))
+	if err != nil {
+		http.Error(w, "Invalid path parameter", http.StatusBadRequest)
+		return
+	}
+
+	article, err := services.PostNiceService(articleID)
+	if err != nil {
+		http.Error(w, "failed to exec", http.StatusNotFound)
+		return
+	}
 	json.NewEncoder(w).Encode(article)
 }
 
