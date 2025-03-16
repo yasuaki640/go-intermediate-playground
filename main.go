@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
-	controllers "github.com/yasuaki640/go-intermediate-playground/handlers"
+	"github.com/yasuaki640/go-intermediate-playground/controllers"
 	"github.com/yasuaki640/go-intermediate-playground/services"
 	"log"
 	"net/http"
