@@ -5,19 +5,14 @@ import (
 	"github.com/yasuaki640/go-intermediate-playground/repositories"
 )
 
-func PostNiceService(articleID int) (models.Article, error) {
-	db, err := connectDB()
-	if err != nil {
-		return models.Article{}, err
-	}
-	defer db.Close()
+func (s *MyAppService) PostNiceService(articleID int) (models.Article, error) {
 
-	err = repositories.UpdateNiceNum(db, articleID)
+	err := repositories.UpdateNiceNum(s.db, articleID)
 	if err != nil {
 		return models.Article{}, err
 	}
 
-	article, err := repositories.SelectArticleDetail(db, articleID)
+	article, err := repositories.SelectArticleDetail(s.db, articleID)
 	if err != nil {
 		return models.Article{}, err
 	}
@@ -25,14 +20,8 @@ func PostNiceService(articleID int) (models.Article, error) {
 	return article, nil
 }
 
-func PostCommentService(comment models.Comment) (models.Comment, error) {
-	db, err := connectDB()
-	if err != nil {
-		return models.Comment{}, err
-	}
-	defer db.Close()
-
-	newComment, err := repositories.InsertComment(db, comment)
+func (s *MyAppService) PostCommentService(comment models.Comment) (models.Comment, error) {
+	newComment, err := repositories.InsertComment(s.db, comment)
 	if err != nil {
 		return models.Comment{}, err
 	}

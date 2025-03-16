@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/yasuaki640/go-intermediate-playground/handlers"
+	controllers "github.com/yasuaki640/go-intermediate-playground/handlers"
+	"github.com/yasuaki640/go-intermediate-playground/services"
 	"log"
 	"net/http"
 )
@@ -21,14 +22,16 @@ func main() {
 	}
 	defer db.Close()
 
+	ser := services.NewMyApService(db)
+	con := controllers.NewMyAppController(ser)
+
 	r := chi.NewRouter()
 
-	r.HandleFunc("/", handlers.HelloHandler)
-	r.Post("/article", handlers.PostArticleHandler)
-	r.Get("/article/list", handlers.ArticleListHandler)
-	r.Get("/article/{id}", handlers.ArticleDetailHandler)
-	r.Put("/article/{id}/nice", handlers.PostNiceHandler)
-	r.Post("/comment", handlers.PostCommentHandler)
+	r.Post("/article", con.PostArticleHandler)
+	r.Get("/article/list", con.ArticleListHandler)
+	r.Get("/article/{id}", con.ArticleDetailHandler)
+	r.Put("/article/{id}/nice", con.PostNiceHandler)
+	r.Post("/comment", con.PostCommentHandler)
 
 	log.Println("listening at port 8080")
 
