@@ -4,9 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/yasuaki640/go-intermediate-playground/controllers"
-	"github.com/yasuaki640/go-intermediate-playground/routers"
-	"github.com/yasuaki640/go-intermediate-playground/services"
+	"github.com/yasuaki640/go-intermediate-playground/api"
+
 	"log"
 	"net/http"
 )
@@ -22,10 +21,7 @@ func main() {
 	}
 	defer db.Close()
 
-	ser := services.NewMyApService(db)
-	con := controllers.NewMyAppController(ser)
-
-	r := routers.NewRouter(con)
+	r := api.NewRouter(db)
 
 	log.Println("listening at port 8080")
 
