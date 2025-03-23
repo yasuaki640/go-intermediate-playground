@@ -3,9 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/yasuaki640/go-intermediate-playground/controllers"
+	"github.com/yasuaki640/go-intermediate-playground/routers"
 	"github.com/yasuaki640/go-intermediate-playground/services"
 	"log"
 	"net/http"
@@ -25,16 +25,10 @@ func main() {
 	ser := services.NewMyApService(db)
 	con := controllers.NewMyAppController(ser)
 
-	r := chi.NewRouter()
-
-	r.Post("/article", con.PostArticleHandler)
-	r.Get("/article/list", con.ArticleListHandler)
-	r.Get("/article/{id}", con.ArticleDetailHandler)
-	r.Put("/article/{id}/nice", con.PostNiceHandler)
-	r.Post("/comment", con.PostCommentHandler)
+	r := routers.NewRouter(con)
 
 	log.Println("listening at port 8080")
 
 	err = http.ListenAndServe(":8080", r)
-	log.Fatal(err) // exit 1のときにログ出力される
+	log.Fatal(err)
 }

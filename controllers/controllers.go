@@ -3,18 +3,19 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
+	"github.com/yasuaki640/go-intermediate-playground/controllers/services"
 	"github.com/yasuaki640/go-intermediate-playground/models"
-	"github.com/yasuaki640/go-intermediate-playground/services"
+
 	"net/http"
 	"strconv"
 )
 
 type MyAppController struct {
-	services *services.MyAppService
+	service services.MyAppServicer
 }
 
-func NewMyAppController(services *services.MyAppService) *MyAppController {
-	return &MyAppController{services: services}
+func NewMyAppController(services services.MyAppServicer) *MyAppController {
+	return &MyAppController{service: services}
 }
 
 func (c *MyAppController) PostArticleHandler(w http.ResponseWriter, req *http.Request) {
@@ -24,7 +25,7 @@ func (c *MyAppController) PostArticleHandler(w http.ResponseWriter, req *http.Re
 		return
 	}
 
-	article, err := c.services.PostArticleService(reqArticle)
+	article, err := c.service.PostArticleService(reqArticle)
 	if err != nil {
 		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
 		return
@@ -49,7 +50,7 @@ func (c *MyAppController) ArticleListHandler(w http.ResponseWriter, req *http.Re
 		}
 	}
 
-	artcles, err := c.services.GetArticleListService(page)
+	artcles, err := c.service.GetArticleListService(page)
 	if err != nil {
 		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
 		return
@@ -57,7 +58,6 @@ func (c *MyAppController) ArticleListHandler(w http.ResponseWriter, req *http.Re
 	json.NewEncoder(w).Encode(artcles)
 }
 
-// func ArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 func (c *MyAppController) ArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 	articleID, err := strconv.Atoi(chi.URLParam(req, "id"))
 	if err != nil {
@@ -65,7 +65,7 @@ func (c *MyAppController) ArticleDetailHandler(w http.ResponseWriter, req *http.
 		return
 	}
 
-	article, err := c.services.GetArticleService(articleID)
+	article, err := c.service.GetArticleService(articleID)
 	if err != nil {
 		http.Error(w, "failed to get article", http.StatusNotFound)
 		return
@@ -81,7 +81,7 @@ func (c *MyAppController) PostNiceHandler(w http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	article, err := c.services.PostNiceService(articleID)
+	article, err := c.service.PostNiceService(articleID)
 	if err != nil {
 		http.Error(w, "failed to exec", http.StatusNotFound)
 		return
@@ -96,7 +96,7 @@ func (c *MyAppController) PostCommentHandler(w http.ResponseWriter, req *http.Re
 		return
 	}
 
-	comment, err := c.services.PostCommentService(reqComment)
+	comment, err := c.service.PostCommentService(reqComment)
 	if err != nil {
 		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
 		return
