@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/yasuaki640/go-intermediate-playground/apperrors"
 	"github.com/yasuaki640/go-intermediate-playground/models"
 	"github.com/yasuaki640/go-intermediate-playground/repositories"
 )
@@ -8,6 +9,7 @@ import (
 func (s *MyAppService) PostArticleService(article models.Article) (models.Article, error) {
 	newArticle, err := repositories.InsertArticle(s.db, article)
 	if err != nil {
+		err = apperrors.InsertDataFailed.Wrap(err, "failed to insert article")
 		return models.Article{}, err
 	}
 
