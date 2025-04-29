@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
+	"github.com/yasuaki640/go-intermediate-playground/apperrors"
 	"github.com/yasuaki640/go-intermediate-playground/controllers/services"
 	"github.com/yasuaki640/go-intermediate-playground/models"
 	"net/http"
@@ -20,8 +21,8 @@ func NewArticleController(s services.ArticleServicer) *ArticleController {
 func (c *ArticleController) PostArticleHandler(w http.ResponseWriter, req *http.Request) {
 	var reqArticle models.Article
 	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
+		err = apperrors.ReqBodyDecodeFailed.Wrap(err, "failed to decode json")
 		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
-		return
 	}
 
 	article, err := c.service.PostArticleService(reqArticle)
@@ -37,13 +38,13 @@ func (c *ArticleController) ArticleListHandler(w http.ResponseWriter, req *http.
 	pageStr := req.URL.Query().Get("page")
 
 	var page int
-
 	if pageStr == "" {
 		page = 1
 	} else {
 		var err error
 		page, err = strconv.Atoi(pageStr)
 		if err != nil {
+			err = apperrors.BadParam.Wrap(err, "failed to convert page")
 			http.Error(w, "Invalid query parameter", http.StatusBadRequest)
 			return
 		}
@@ -51,7 +52,6 @@ func (c *ArticleController) ArticleListHandler(w http.ResponseWriter, req *http.
 
 	artcles, err := c.service.GetArticleListService(page)
 	if err != nil {
-		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
 		return
 	}
 	json.NewEncoder(w).Encode(artcles)
@@ -60,6 +60,7 @@ func (c *ArticleController) ArticleListHandler(w http.ResponseWriter, req *http.
 func (c *ArticleController) ArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 	articleID, err := strconv.Atoi(chi.URLParam(req, "id"))
 	if err != nil {
+		err = apperrors.BadParam.Wrap(err, "failed to convert articleID")
 		http.Error(w, "Invalid path parameter", http.StatusBadRequest)
 		return
 	}
@@ -76,6 +77,7 @@ func (c *ArticleController) ArticleDetailHandler(w http.ResponseWriter, req *htt
 func (c *ArticleController) PostNiceHandler(w http.ResponseWriter, req *http.Request) {
 	articleID, err := strconv.Atoi(chi.URLParam(req, "id"))
 	if err != nil {
+		err = apperrors.BadParam.Wrap(err, "failed to convert articleID")
 		http.Error(w, "Invalid path parameter", http.StatusBadRequest)
 		return
 	}
