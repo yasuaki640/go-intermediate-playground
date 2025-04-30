@@ -22,12 +22,12 @@ func (c *ArticleController) PostArticleHandler(w http.ResponseWriter, req *http.
 	var reqArticle models.Article
 	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
 		err = apperrors.ReqBodyDecodeFailed.Wrap(err, "failed to decode json")
-		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
+		apperrors.ErrorHandler(w, req, err)
 	}
 
 	article, err := c.service.PostArticleService(reqArticle)
 	if err != nil {
-		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
@@ -45,7 +45,7 @@ func (c *ArticleController) ArticleListHandler(w http.ResponseWriter, req *http.
 		page, err = strconv.Atoi(pageStr)
 		if err != nil {
 			err = apperrors.BadParam.Wrap(err, "failed to convert page")
-			http.Error(w, "Invalid query parameter", http.StatusBadRequest)
+			apperrors.ErrorHandler(w, req, err)
 			return
 		}
 	}
@@ -61,13 +61,13 @@ func (c *ArticleController) ArticleDetailHandler(w http.ResponseWriter, req *htt
 	articleID, err := strconv.Atoi(chi.URLParam(req, "id"))
 	if err != nil {
 		err = apperrors.BadParam.Wrap(err, "failed to convert articleID")
-		http.Error(w, "Invalid path parameter", http.StatusBadRequest)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
 	article, err := c.service.GetArticleService(articleID)
 	if err != nil {
-		http.Error(w, "failed to get article", http.StatusNotFound)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
@@ -78,13 +78,13 @@ func (c *ArticleController) PostNiceHandler(w http.ResponseWriter, req *http.Req
 	articleID, err := strconv.Atoi(chi.URLParam(req, "id"))
 	if err != nil {
 		err = apperrors.BadParam.Wrap(err, "failed to convert articleID")
-		http.Error(w, "Invalid path parameter", http.StatusBadRequest)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
 	article, err := c.service.PostNiceService(articleID)
 	if err != nil {
-		http.Error(w, "failed to exec", http.StatusNotFound)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	json.NewEncoder(w).Encode(article)
