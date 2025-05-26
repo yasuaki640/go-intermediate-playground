@@ -53,6 +53,7 @@ func (c *ArticleController) ArticleListHandler(w http.ResponseWriter, req *http.
 
 	artcles, err := c.service.GetArticleListService(page)
 	if err != nil {
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 	json.NewEncoder(w).Encode(artcles)
