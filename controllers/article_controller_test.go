@@ -14,7 +14,6 @@ import (
 var aCon *controllers.ArticleController
 
 func TestMain(m *testing.M) {
-
 	ser := testdata.NewServiceMock()
 	aCon = controllers.NewArticleController(ser)
 
