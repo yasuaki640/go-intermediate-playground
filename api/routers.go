@@ -2,13 +2,17 @@ package api
 
 import (
 	"database/sql"
+
 	"github.com/go-chi/chi/v5"
+	"github.com/yasuaki640/go-intermediate-playground/api/middlewares"
 	"github.com/yasuaki640/go-intermediate-playground/controllers"
 	"github.com/yasuaki640/go-intermediate-playground/services"
 )
 
 func NewRouter(db *sql.DB) chi.Router {
 	r := chi.NewRouter()
+
+	r.Use(middlewares.LoggingMiddleware)
 
 	ser := services.NewMyApService(db)
 	aCon := controllers.NewArticleController(ser)
