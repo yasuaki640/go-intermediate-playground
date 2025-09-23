@@ -4,17 +4,20 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/yasuaki540/go-intermediate-playground/handlers"
 )
 
 func main() {
-	http.HandleFunc("/hello", handlers.HelloHandler)
-	http.HandleFunc("/article", handlers.PostArticleHandler)
-	http.HandleFunc("/article/list", handlers.ArticleListHandler)
-	http.HandleFunc("/article/1", handlers.ArticleDetailHandler)
-	http.HandleFunc("/article/nice", handlers.PostNiceHandler)
-	http.HandleFunc("/comment", handlers.PostCommentHandler)
+
+	r := chi.NewRouter()
+
+	r.Post("/article", handlers.PostArticleHandler)
+	r.Get("/article/list", handlers.ArticleListHandler)
+	r.Get("/article/1", handlers.ArticleDetailHandler)
+	r.Post("/article/nice", handlers.PostNiceHandler)
+	r.Post("/comment", handlers.PostCommentHandler)
 
 	log.Println("server start at port 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
