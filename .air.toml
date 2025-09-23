@@ -1,0 +1,17 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/main ."
+  bin = "./tmp/main"
+  include_ext = ["go", "mod", "sum", "tmpl", "html"]
+  exclude_dir = ["tmp", "vendor", ".git", ".idea"]
+  exclude_file = ["*_test.go"]
+
+[log]
+  time = true
+
+[watcher]
+  dirs = ["."]
+  exclude_dir = ["tmp", "vendor", ".git", ".idea"]
+  include_ext = ["go", "mod", "sum", "tmpl", "html"]

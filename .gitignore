@@ -29,3 +29,6 @@ go.work
 .idea
 .env
 *.log
+
+# Air temporary build dir
+tmp/

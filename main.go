@@ -19,5 +19,5 @@ func main() {
 	r.Post("/comment", handlers.PostCommentHandler)
 
 	log.Println("server start at port 8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe("localhost:8080", r))
 }
