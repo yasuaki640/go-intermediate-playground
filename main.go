@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/yasuaki540/go-intermediate-playground/handlers"
 	"log"
 	"net/http"
+
+	"github.com/yasuaki540/go-intermediate-playground/handlers"
 )
 
 func main() {
